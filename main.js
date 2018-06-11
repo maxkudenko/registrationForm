@@ -23,14 +23,8 @@ const server = http.createServer( (req, res) => {
   }
 
   function sendHTML() {
-    let readStream = fs.createReadStream('./index.html');
     res.writeHead(200, {'Content-Type': 'text/html'});
-    readStream.on('data', chunk => {
-      res.write(chunk);
-    });
-    readStream.on('end', () => {
-      res.end();
-    });
+    fs.createReadStream('./index.html').pipe(res);
   }
 
 });
