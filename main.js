@@ -4,22 +4,32 @@ const querystring = require('querystring');
 
 const server = http.createServer( (req, res) => {
 
-  if(req.method === 'GET' && req.url === '/') {
-    sendHTML();
-  }
+  switch (req.method) {
+    case 'GET':
+      if(req.url === '/'){
+        sendHTML();
+      }
+      break;
 
-  if(req.method === 'POST') {
-    let body = '';
-    req.on('data', (chunk) => {
-      body += chunk;
-    }).on('end', () => {
-      let data = querystring.parse(body);
-      data = JSON.stringify(data);
-      let writeStream = fs.createWriteStream('db.json', {flags: 'a'});
-      writeStream.write(`${data}\n`);
-      writeStream.end();
-      sendHTML();
-    });
+    case 'POST':
+      if(req.url === '/'){
+        let body = '';
+        req.on('data', (chunk) => {
+          body += chunk;
+        }).on('end', () => {
+          let data = querystring.parse(body);
+          data = JSON.stringify(data);
+          fs.appendFile('db.json', `${data},\n`, (err) => {
+            if(err) throw err;
+          });
+          sendHTML();
+        });
+      }
+      break;
+
+    default:
+      res.statusCode = 501;
+      res.end('Not implemented')
   }
 
   function sendHTML() {
